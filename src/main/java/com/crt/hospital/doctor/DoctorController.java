@@ -1,4 +1,4 @@
-package com.crt.hospital.patient;
+package com.crt.hospital.doctor;
 
 import java.util.List;
 
@@ -13,43 +13,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/patients")
+@RequestMapping("/api/doctors")
 @CrossOrigin(origins = "*")
-public class PatientController {
-    private final PatientRepository repository;
+public class DoctorController {
+    private final DoctorRepository repository;
 
-    public PatientController(PatientRepository repository) {
+    public DoctorController(DoctorRepository repository) {
         this.repository = repository;
     }
 
     @GetMapping
-    public List<Patient> listPatients() {
+    public List<Doctor> listDoctors() {
         return repository.findAll();
     }
 
     @PostMapping
-    public ResponseEntity<Patient> createPatient(@RequestBody PatientRequest request) {
+    public ResponseEntity<Doctor> createDoctor(@RequestBody DoctorRequest request) {
         if (request.getName() == null || request.getName().isBlank()) {
             return ResponseEntity.badRequest().build();
         }
-        if (request.getDepartment() == null || request.getDepartment().isBlank()) {
-            return ResponseEntity.badRequest().build();
-        }
-        if (request.getDoctorId() == null || request.getDoctorId() <= 0) {
+        if (request.getSpecialty() == null || request.getSpecialty().isBlank()) {
             return ResponseEntity.badRequest().build();
         }
 
-        String time = request.getTime() == null || request.getTime().isBlank() ? "TBD" : request.getTime().trim();
-        Patient patient = repository.create(
-                request.getName().trim(),
-                request.getDepartment().trim(),
-                time,
-                request.getDoctorId());
-        return ResponseEntity.ok(patient);
+        Doctor doctor = repository.create(request.getName().trim(), request.getSpecialty().trim());
+        return ResponseEntity.ok(doctor);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePatient(@PathVariable long id) {
+    public ResponseEntity<Void> deleteDoctor(@PathVariable long id) {
         boolean deleted = repository.deleteById(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
